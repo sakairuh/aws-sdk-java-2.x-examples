@@ -10,8 +10,6 @@ import software.amazon.awssdk.services.ec2.model.Ec2Exception;
 
 public class Ec2 {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
-
         Region region = Region.AP_NORTHEAST_1;
         Ec2Client ec2 = Ec2Client.builder()
                 .region(region)
