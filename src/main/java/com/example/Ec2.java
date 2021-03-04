@@ -2,11 +2,7 @@ package com.example;
 
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
-import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
-import software.amazon.awssdk.services.ec2.model.Instance;
-import software.amazon.awssdk.services.ec2.model.Reservation;
-import software.amazon.awssdk.services.ec2.model.Ec2Exception;
+import software.amazon.awssdk.services.ec2.model.*;
 
 public class Ec2 {
     public static void main(String[] args) {
@@ -22,12 +18,23 @@ public class Ec2 {
         boolean done = false;
         String nextToken = null;
 
+        String[] targetDnsName = {"ip-172-x-x-x.ap-northeast-1.compute.internal","ip-172-x-x-x.ap-northeast-1.compute.internal"};
+
+        Filter dnsNameFilter = Filter.builder()
+                .name("private-dns-name")
+                .values(targetDnsName)
+                .build();
+
         try {
 
             do {
-                DescribeInstancesRequest request = DescribeInstancesRequest.builder().maxResults(6).nextToken(nextToken).build();
+                DescribeInstancesRequest request = DescribeInstancesRequest.builder()
+                        .maxResults(6)
+                        .filters(dnsNameFilter)
+                        .nextToken(nextToken)
+                        .build();
                 DescribeInstancesResponse response = ec2.describeInstances(request);
-
+                System.out.println("id, state, privateDnsName, privateIpAddress, publicDnsName, publicIpAddress");
                 for (Reservation reservation : response.reservations()) {
                     for (Instance instance : reservation.instances()) {
 //                        System.out.printf(
@@ -41,11 +48,8 @@ public class Ec2 {
 //                                instance.instanceType(),
 //                                instance.state().name(),
 //                                instance.monitoring().state());
-//                        System.out.println("");
-
-                        System.out.println("id, state, privateDnsName, privateIpAddress, publicDnsName, publicIpAddress");
                         System.out.printf(
-                                "%s, %s, %s, %s, %s, %s",
+                                "%s, %s, %s, %s, %s, %s\n",
                                 instance.instanceId(),
                                 instance.state(),
                                 instance.privateDnsName(),
